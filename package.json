@@ -2,4 +2,8 @@
   "name": "node-dump-syms",
   "version": "0.0.1",
   "main": "index.js",
-  "license": "MIT"}
+  "license": "MIT",
+  "scripts": {
+    "install": "node ./build.js"
+  }
+}
