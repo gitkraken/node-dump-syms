@@ -6,9 +6,8 @@ const spawn = (...args) => new Promise((resolve, reject) => {
   let stdout = Buffer.alloc(0);
   let stderr = Buffer.alloc(0);
   const child = spawnSync(...args);
-  const concat = (o) => (b) => o = Buffer.concat([o, b]);
-  child.stdout.on('data', concat(stdout));
-  child.stderr.on('data', concat(stderr));
+  child.stdout.on('data', (b) => stdout = Buffer.concat([stdout, b]));
+  child.stderr.on('data', (b) => stderr = Buffer.concat([stderr, b]));
   child.on('close', function (code) {
     if (code !== 0) {
       reject(stderr ? new Error(stderr.toString()) : new Error(`Command ${command} failed ${code}`));

@@ -1,10 +1,10 @@
 const { stat } = require('fs/promises');
 const path = require('path');
-const {promises: fs, constants } = require('fs');
+const { promises: fs, constants } = require('fs');
 const { promisify } = require('util');
 const execFile = promisify(require('child_process').execFile);
 
-const { spawn, paths, exists } = require('./util');
+const { spawn, paths, exists } = require('./shared');
 
 (async () => {
   if (await exists(paths.exeFinal)) {
