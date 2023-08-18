@@ -1,0 +1,43 @@
+name: Build And Release
+
+on: [workflow_dispatch, push]
+
+jobs:
+  Build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Checking out Repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Building
+        run: yarn install
+
+      - name: Uploading
+        uses: actions/upload-artifact@v3
+        with:
+          name: bin-${{runner.os}}
+          path: bin/**
+
+  Release:
+    if: ${{github.event_name == 'tag'}}
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out Repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      # this will only publish if the version has been updated
+      - name: NPM Publish
+        uses: JS-DevTools/npm-publish@v2.2.1
+        with:
+          token: ${{secrets.NPM_TOKEN}}
