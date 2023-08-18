@@ -1,0 +1,3 @@
+[submodule "deps/dump_syms"]
+	path = deps/dump_syms
+	url = git@github.com:mozilla/dump_syms
