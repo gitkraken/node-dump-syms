@@ -37,7 +37,7 @@ jobs:
       - name: Uploading
         uses: actions/upload-artifact@v3
         with:
-          name: bin-${{runner.os}}
+          name: bin-${{runner.os}}-${{runner.arch}}
           path: bin/**
 
   Release:
