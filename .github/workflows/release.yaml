@@ -24,6 +24,13 @@ jobs:
         if: ${{runner.os == 'macOS' && runner.arch == 'arm64'}}
         run: npm install -g yarn
 
+      - name: Install Rust
+        if: ${{runner.os == 'macOS' && runner.arch == 'arm64'}}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
       - name: Building
         run: yarn install
 
