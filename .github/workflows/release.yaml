@@ -35,13 +35,14 @@ jobs:
         run: yarn install
 
       - name: Uploading
+        if: ${{github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
         uses: actions/upload-artifact@v3
         with:
           name: bin-${{runner.os}}-${{runner.arch}}
           path: bin/**
 
   Release:
-    if: ${{github.event_name == 'tag'}}
+    if: ${{github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
     needs: Build
     runs-on: ubuntu-latest
     steps:
