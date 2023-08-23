@@ -54,6 +54,12 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
+      - name: Fix Directory Structure
+        run: |
+          mkdir bin
+          mv bin-*/* bin/
+          rm bin-*
+
       # this will only publish if the version has been updated
       - name: NPM Publish
         uses: JS-DevTools/npm-publish@v2.2.1
