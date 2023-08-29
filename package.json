@@ -3,7 +3,7 @@
   "repository": {
     "url": "https://github.com/gitkraken/node-dump-syms"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
