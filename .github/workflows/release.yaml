@@ -59,6 +59,7 @@ jobs:
           mkdir bin
           mv bin-*/* bin/
           rm -rf bin-*
+          sudo chmod -R +x bin
 
       # this will only publish if the version has been updated
       - name: NPM Publish
