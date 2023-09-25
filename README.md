@@ -1,6 +1,6 @@
 # @axosoft/dump-syms
 
-A thin node-js wrapper around [Mozilla/dump-syms](https://github.com/mozilla/dump-syms)
+A thin node-js wrapper around [Mozilla/dump_syms](https://github.com/mozilla/dump_syms)
 
 ### Build
 
