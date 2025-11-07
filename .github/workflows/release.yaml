@@ -6,7 +6,14 @@ jobs:
   Build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, 'ghcr.io/cirruslabs/macos-monterey-xcode:latest']
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        arch:
+          - x64
+          - arm64
+
     runs-on: ${{matrix.os}}
     steps:
       - name: Checking out Repository
@@ -14,31 +21,41 @@ jobs:
         with:
           submodules: true
 
-      - name: Installing node
-        if: ${{runner.os == 'macOS' && runner.arch == 'arm64'}}
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Installing yarn
-        if: ${{runner.os == 'macOS' && runner.arch == 'arm64'}}
-        run: npm install -g yarn
-
+      # linux
       - name: Install Rust
-        if: ${{runner.os == 'macOS' && runner.arch == 'arm64'}}
-        uses: actions-rs/toolchain@v1
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          default: true
+          targets: ${{ matrix.arch == 'arm64' && 'aarch64-unknown-linux-gnu' || 'x86_64-unknown-linux-gnu' }}
+
+      # macos
+      - name: Install Rust
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: ${{ matrix.arch == 'arm64' && 'aarch64-apple-darwin' || 'x86_64-apple-darwin' }}
+
+      # windows
+      - name: Install Rust
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: ${{ matrix.arch == 'arm64' && 'aarch64-pc-windows-msvc' || 'x86_64-pc-windows-msvc' }}
 
       - name: Building
-        run: yarn install
+        run: pnpm install
 
       - name: Uploading
         if: ${{github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
         uses: actions/upload-artifact@v3
         with:
-          name: bin-${{runner.os}}-${{runner.arch}}
+          name: bin-${{runner.os}}-${{matrix.arch}}
           path: bin/**
 
   Release:
