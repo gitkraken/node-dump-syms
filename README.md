@@ -4,7 +4,7 @@ A thin node-js wrapper around [Mozilla/dump_syms](https://github.com/mozilla/dum
 
 ### Build
 
-`yarn install`
+`pnpm install`
 
 ### Usage
 
