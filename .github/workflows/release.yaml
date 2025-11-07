@@ -53,7 +53,7 @@ jobs:
 
       - name: Uploading
         if: ${{github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')}}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: bin-${{runner.os}}-${{matrix.arch}}
           path: bin/**
