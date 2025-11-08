@@ -4,25 +4,27 @@ const { promises: fs, constants } = require('fs');
 const { promisify } = require('util');
 const execFile = promisify(require('child_process').execFile);
 
-const { spawn, paths, exists } = require('./shared');
+const { getRustTarget } = require('./utils/getTarget');
+const { spawn, buildPaths, exists } = require('./shared');
 
 (async () => {
-  if (await exists(paths.exeFinal)) {
+  if (await exists(buildPaths.exeFinal)) {
     return;
   }
 
-  if (!(await exists(paths.bin))) {
-    await fs.mkdir(paths.bin, { recursive: true });
+  if (!(await exists(buildPaths.bin))) {
+    await fs.mkdir(buildPaths.bin, { recursive: true });
   }
 
   await spawn('cargo', [
     'build',
-    `--manifest-path=${path.join(paths.submodule, 'Cargo.toml')}`,
-    `--target-dir=${paths.build}`,
+    `--target=${getRustTarget()}`,
+    `--manifest-path=${path.join(buildPaths.submodule, 'Cargo.toml')}`,
+    `--target-dir=${buildPaths.build}`,
     '--release'
   ]);
   await fs.copyFile(
-    paths.exeOut,
-    paths.exeFinal
+    buildPaths.exeOut,
+    buildPaths.exeFinal
   );
 })();

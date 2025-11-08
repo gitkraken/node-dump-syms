@@ -24,31 +24,30 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      # linux
-      - name: Install Rust
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-          targets: ${{ matrix.arch == 'arm64' && 'aarch64-unknown-linux-gnu' || 'x86_64-unknown-linux-gnu' }}
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
-      # macos
-      - name: Install Rust
-        if: ${{ matrix.os == 'macos-latest' }}
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-          targets: ${{ matrix.arch == 'arm64' && 'aarch64-apple-darwin' || 'x86_64-apple-darwin' }}
+      - name: Get Target Name
+        id: get_target
+        env:
+          npm_config_arch: ${{ matrix.arch }}
+        shell: bash
+        run: |
+          TARGET_NAME=$(node ./utils/getTarget.js)
+          echo "target_name=$TARGET_NAME" >> $GITHUB_OUTPUT
 
-      # windows
       - name: Install Rust
-        if: ${{ matrix.os == 'windows-latest' }}
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          targets: ${{ matrix.arch == 'arm64' && 'aarch64-pc-windows-msvc' || 'x86_64-pc-windows-msvc' }}
+          targets: ${{ steps.get_target.outputs.target_name }}
 
       - name: Building
+        env:
+          npm_config_arch: ${{ matrix.arch }}
         run: pnpm install
 
       - name: Uploading
