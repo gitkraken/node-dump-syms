@@ -2,7 +2,7 @@ const path = require('path');
 const { promises: fs } = require('fs');
 const { spawn: spawnSync } = require('child_process');
 
-const { getTargetArch } = require('./utils/getTarget');
+const { getTargetArch, getRustTarget } = require('./utils/getTarget');
 
 const spawn = (...args) => new Promise((resolve, reject) => {
   let stdout = Buffer.alloc(0);
@@ -33,7 +33,7 @@ const getPaths = (arch) => ({
   submodule: path.join(__dirname, 'deps', 'dump_syms'),
   bin: path.join(__dirname, 'bin', `${process.platform}-${arch}`),
   build: path.join(__dirname, 'build'),
-  exeOut: path.join(__dirname, 'build', 'release', `dump_syms${exe}`),
+  exeOut: path.join(__dirname, 'build', getRustTarget(), 'release', `dump_syms${exe}`),
   exeFinal: path.join(__dirname, 'bin', `${process.platform}-${arch}`, `dump_syms${exe}`),
 });
 

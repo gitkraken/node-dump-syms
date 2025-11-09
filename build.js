@@ -23,6 +23,7 @@ const { spawn, buildPaths, exists } = require('./shared');
     `--target-dir=${buildPaths.build}`,
     '--release'
   ]);
+
   await fs.copyFile(
     buildPaths.exeOut,
     buildPaths.exeFinal
