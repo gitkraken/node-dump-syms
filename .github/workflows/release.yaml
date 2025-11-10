@@ -1,6 +1,15 @@
 name: Build And Release
 
-on: [workflow_dispatch, push]
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+
+permissions:
+  id-token: write
 
 jobs:
   Build:
@@ -74,19 +83,49 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Installing NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
 
       - name: Fix Directory Structure
         run: |
           mkdir bin
+          ls -la
           mv bin-*/* bin/
           rm -rf bin-*
+          ls -la bin
           sudo chmod -R +x bin
+
+      - name: Verify Binaries
+        run: |
+          if [ ! -f bin/linux-x64/dump_syms ]; then echo "Missing bin/linux-x64/dump_syms" && exit 1; fi
+          if [ ! -f bin/linux-arm64/dump_syms ]; then echo "Missing bin/linux-arm64/dump_syms" && exit 1; fi
+          if [ ! -f bin/darwin-x64/dump_syms ]; then echo "Missing bin/darwin-x64/dump_syms" && exit 1; fi
+          if [ ! -f bin/darwin-arm64/dump_syms ]; then echo "Missing bin/darwin-arm64/dump_syms" && exit 1; fi
+          if [ ! -f bin/win32-x64/dump_syms.exe ]; then echo "Missing bin/win32-x64/dump_syms.exe" && exit 1; fi
+          if [ ! -f bin/win32-arm64/dump_syms.exe ]; then echo "Missing bin/win32-arm64/dump_syms.exe" && exit 1; fi
+
+      - name: Verify Version
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match package.json version ($PACKAGE_VERSION)"
+            exit 1
+          fi
 
       # this will only publish if the version has been updated
       - name: NPM Publish
-        uses: JS-DevTools/npm-publish@v2.2.1
-        with:
-          token: ${{secrets.NPM_TOKEN}}
+        run: |
+          npm publish
