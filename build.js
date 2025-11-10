@@ -16,13 +16,20 @@ const { spawn, buildPaths, exists } = require('./shared');
     await fs.mkdir(buildPaths.bin, { recursive: true });
   }
 
+  const customLinkerFlags = process.env.CC
+    ? ['--config', `target.${getRustTarget()}.linker="${process.env.CC}"`]
+    : [];
+
   await spawn('cargo', [
     'build',
     `--target=${getRustTarget()}`,
+    ...customLinkerFlags,
     `--manifest-path=${path.join(buildPaths.submodule, 'Cargo.toml')}`,
     `--target-dir=${buildPaths.build}`,
     '--release'
-  ]);
+  ], {
+    env: process.env,
+  });
 
   await fs.copyFile(
     buildPaths.exeOut,

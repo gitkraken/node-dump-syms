@@ -46,6 +46,14 @@ jobs:
           targets: ${{ steps.get_target.outputs.target_name }}
 
       - name: Building
+        if: runner.os == 'Linux' && matrix.arch == 'arm64'
+        env:
+          npm_config_arch: ${{ matrix.arch }}
+          CC: aarch64-linux-gnu-gcc
+        run: pnpm install
+
+      - name: Building
+        if: ${{ !(runner.os == 'Linux' && matrix.arch == 'arm64') }}
         env:
           npm_config_arch: ${{ matrix.arch }}
         run: pnpm install
